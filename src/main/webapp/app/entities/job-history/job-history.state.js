@@ -97,6 +97,7 @@
                             return {
                                 startDate: null,
                                 endDate: null,
+                                language: null,
                                 id: null
                             };
                         }

@@ -2,7 +2,11 @@ package guru.springframework.web.rest;
 
 import guru.springframework.JdlDemoApp;
 import guru.springframework.domain.JobHistory;
+import guru.springframework.domain.enumeration.Language;
 import guru.springframework.repository.JobHistoryRepository;
+import guru.springframework.service.JobHistoryService;
+import guru.springframework.service.dto.JobHistoryDTO;
+import guru.springframework.service.mapper.JobHistoryMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,7 +34,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 /**
  * Test class for the JobHistoryResource REST controller.
  *
@@ -51,8 +54,17 @@ public class JobHistoryResourceIntTest {
     private static final ZonedDateTime UPDATED_END_DATE = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
     private static final String DEFAULT_END_DATE_STR = dateTimeFormatter.format(DEFAULT_END_DATE);
 
+    private static final Language DEFAULT_LANGUAGE = Language.FRENCH;
+    private static final Language UPDATED_LANGUAGE = Language.ENGLISH;
+
     @Inject
     private JobHistoryRepository jobHistoryRepository;
+
+    @Inject
+    private JobHistoryMapper jobHistoryMapper;
+
+    @Inject
+    private JobHistoryService jobHistoryService;
 
     @Inject
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -71,7 +83,7 @@ public class JobHistoryResourceIntTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
         JobHistoryResource jobHistoryResource = new JobHistoryResource();
-        ReflectionTestUtils.setField(jobHistoryResource, "jobHistoryRepository", jobHistoryRepository);
+        ReflectionTestUtils.setField(jobHistoryResource, "jobHistoryService", jobHistoryService);
         this.restJobHistoryMockMvc = MockMvcBuilders.standaloneSetup(jobHistoryResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setMessageConverters(jacksonMessageConverter).build();
@@ -86,7 +98,8 @@ public class JobHistoryResourceIntTest {
     public static JobHistory createEntity(EntityManager em) {
         JobHistory jobHistory = new JobHistory()
                 .startDate(DEFAULT_START_DATE)
-                .endDate(DEFAULT_END_DATE);
+                .endDate(DEFAULT_END_DATE)
+                .language(DEFAULT_LANGUAGE);
         return jobHistory;
     }
 
@@ -101,10 +114,11 @@ public class JobHistoryResourceIntTest {
         int databaseSizeBeforeCreate = jobHistoryRepository.findAll().size();
 
         // Create the JobHistory
+        JobHistoryDTO jobHistoryDTO = jobHistoryMapper.jobHistoryToJobHistoryDTO(jobHistory);
 
         restJobHistoryMockMvc.perform(post("/api/job-histories")
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                .content(TestUtil.convertObjectToJsonBytes(jobHistory)))
+                .content(TestUtil.convertObjectToJsonBytes(jobHistoryDTO)))
                 .andExpect(status().isCreated());
 
         // Validate the JobHistory in the database
@@ -113,6 +127,7 @@ public class JobHistoryResourceIntTest {
         JobHistory testJobHistory = jobHistories.get(jobHistories.size() - 1);
         assertThat(testJobHistory.getStartDate()).isEqualTo(DEFAULT_START_DATE);
         assertThat(testJobHistory.getEndDate()).isEqualTo(DEFAULT_END_DATE);
+        assertThat(testJobHistory.getLanguage()).isEqualTo(DEFAULT_LANGUAGE);
     }
 
     @Test
@@ -127,7 +142,8 @@ public class JobHistoryResourceIntTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.[*].id").value(hasItem(jobHistory.getId().intValue())))
                 .andExpect(jsonPath("$.[*].startDate").value(hasItem(DEFAULT_START_DATE_STR)))
-                .andExpect(jsonPath("$.[*].endDate").value(hasItem(DEFAULT_END_DATE_STR)));
+                .andExpect(jsonPath("$.[*].endDate").value(hasItem(DEFAULT_END_DATE_STR)))
+                .andExpect(jsonPath("$.[*].language").value(hasItem(DEFAULT_LANGUAGE.toString())));
     }
 
     @Test
@@ -142,7 +158,8 @@ public class JobHistoryResourceIntTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(jobHistory.getId().intValue()))
             .andExpect(jsonPath("$.startDate").value(DEFAULT_START_DATE_STR))
-            .andExpect(jsonPath("$.endDate").value(DEFAULT_END_DATE_STR));
+            .andExpect(jsonPath("$.endDate").value(DEFAULT_END_DATE_STR))
+            .andExpect(jsonPath("$.language").value(DEFAULT_LANGUAGE.toString()));
     }
 
     @Test
@@ -164,11 +181,13 @@ public class JobHistoryResourceIntTest {
         JobHistory updatedJobHistory = jobHistoryRepository.findOne(jobHistory.getId());
         updatedJobHistory
                 .startDate(UPDATED_START_DATE)
-                .endDate(UPDATED_END_DATE);
+                .endDate(UPDATED_END_DATE)
+                .language(UPDATED_LANGUAGE);
+        JobHistoryDTO jobHistoryDTO = jobHistoryMapper.jobHistoryToJobHistoryDTO(updatedJobHistory);
 
         restJobHistoryMockMvc.perform(put("/api/job-histories")
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                .content(TestUtil.convertObjectToJsonBytes(updatedJobHistory)))
+                .content(TestUtil.convertObjectToJsonBytes(jobHistoryDTO)))
                 .andExpect(status().isOk());
 
         // Validate the JobHistory in the database
@@ -177,6 +196,7 @@ public class JobHistoryResourceIntTest {
         JobHistory testJobHistory = jobHistories.get(jobHistories.size() - 1);
         assertThat(testJobHistory.getStartDate()).isEqualTo(UPDATED_START_DATE);
         assertThat(testJobHistory.getEndDate()).isEqualTo(UPDATED_END_DATE);
+        assertThat(testJobHistory.getLanguage()).isEqualTo(UPDATED_LANGUAGE);
     }
 
     @Test

@@ -18,9 +18,6 @@ public class Country implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "country_id")
-    private Long countryId;
-
     @Column(name = "country_name")
     private String countryName;
 
@@ -34,19 +31,6 @@ public class Country implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public Country countryId(Long countryId) {
-        this.countryId = countryId;
-        return this;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
     }
 
     public String getCountryName() {
@@ -99,7 +83,6 @@ public class Country implements Serializable {
     public String toString() {
         return "Country{" +
             "id=" + id +
-            ", countryId='" + countryId + "'" +
             ", countryName='" + countryName + "'" +
             '}';
     }

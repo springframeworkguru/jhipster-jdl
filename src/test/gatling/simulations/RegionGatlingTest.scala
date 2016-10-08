@@ -67,7 +67,7 @@ class RegionGatlingTest extends Simulation {
             .exec(http("Create new region")
             .post("/api/regions")
             .headers(headers_http_authenticated)
-            .body(StringBody("""{"id":null, "regionId":null, "regionName":"SAMPLE_TEXT"}""")).asJSON
+            .body(StringBody("""{"id":null, "regionName":"SAMPLE_TEXT"}""")).asJSON
             .check(status.is(201))
             .check(headerRegex("Location", "(.*)").saveAs("new_region_url"))).exitHereIfFailed
             .pause(10)

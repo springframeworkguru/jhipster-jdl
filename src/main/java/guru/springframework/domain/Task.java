@@ -1,6 +1,7 @@
 package guru.springframework.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.annotations.ApiModel;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -9,8 +10,12 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * A Task.
+ * Task entity.@author The JHipster team.
+ *
  */
+@ApiModel(description = ""
+    + "Task entity.@author The JHipster team.                                 "
+    + "")
 @Entity
 @Table(name = "task")
 public class Task implements Serializable {
@@ -20,9 +25,6 @@ public class Task implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
-    @Column(name = "task_id")
-    private Long taskId;
 
     @Column(name = "title")
     private String title;
@@ -40,19 +42,6 @@ public class Task implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Long getTaskId() {
-        return taskId;
-    }
-
-    public Task taskId(Long taskId) {
-        this.taskId = taskId;
-        return this;
-    }
-
-    public void setTaskId(Long taskId) {
-        this.taskId = taskId;
     }
 
     public String getTitle() {
@@ -130,7 +119,6 @@ public class Task implements Serializable {
     public String toString() {
         return "Task{" +
             "id=" + id +
-            ", taskId='" + taskId + "'" +
             ", title='" + title + "'" +
             ", description='" + description + "'" +
             '}';

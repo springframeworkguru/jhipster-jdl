@@ -95,7 +95,6 @@
                     resolve: {
                         entity: function () {
                             return {
-                                regionId: null,
                                 regionName: null,
                                 id: null
                             };

@@ -1,8 +1,8 @@
 package guru.springframework.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
-import guru.springframework.domain.Department;
-import guru.springframework.repository.DepartmentRepository;
+import guru.springframework.service.DepartmentService;
+import guru.springframework.service.dto.DepartmentDTO;
 import guru.springframework.web.rest.util.HeaderUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,25 +28,25 @@ public class DepartmentResource {
     private final Logger log = LoggerFactory.getLogger(DepartmentResource.class);
 
     @Inject
-    private DepartmentRepository departmentRepository;
+    private DepartmentService departmentService;
 
     /**
      * POST  /departments : Create a new department.
      *
-     * @param department the department to create
-     * @return the ResponseEntity with status 201 (Created) and with body the new department, or with status 400 (Bad Request) if the department has already an ID
+     * @param departmentDTO the departmentDTO to create
+     * @return the ResponseEntity with status 201 (Created) and with body the new departmentDTO, or with status 400 (Bad Request) if the department has already an ID
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @RequestMapping(value = "/departments",
         method = RequestMethod.POST,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Department> createDepartment(@Valid @RequestBody Department department) throws URISyntaxException {
-        log.debug("REST request to save Department : {}", department);
-        if (department.getId() != null) {
+    public ResponseEntity<DepartmentDTO> createDepartment(@Valid @RequestBody DepartmentDTO departmentDTO) throws URISyntaxException {
+        log.debug("REST request to save Department : {}", departmentDTO);
+        if (departmentDTO.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("department", "idexists", "A new department cannot already have an ID")).body(null);
         }
-        Department result = departmentRepository.save(department);
+        DepartmentDTO result = departmentService.save(departmentDTO);
         return ResponseEntity.created(new URI("/api/departments/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert("department", result.getId().toString()))
             .body(result);
@@ -55,24 +55,24 @@ public class DepartmentResource {
     /**
      * PUT  /departments : Updates an existing department.
      *
-     * @param department the department to update
-     * @return the ResponseEntity with status 200 (OK) and with body the updated department,
-     * or with status 400 (Bad Request) if the department is not valid,
-     * or with status 500 (Internal Server Error) if the department couldnt be updated
+     * @param departmentDTO the departmentDTO to update
+     * @return the ResponseEntity with status 200 (OK) and with body the updated departmentDTO,
+     * or with status 400 (Bad Request) if the departmentDTO is not valid,
+     * or with status 500 (Internal Server Error) if the departmentDTO couldnt be updated
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @RequestMapping(value = "/departments",
         method = RequestMethod.PUT,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Department> updateDepartment(@Valid @RequestBody Department department) throws URISyntaxException {
-        log.debug("REST request to update Department : {}", department);
-        if (department.getId() == null) {
-            return createDepartment(department);
+    public ResponseEntity<DepartmentDTO> updateDepartment(@Valid @RequestBody DepartmentDTO departmentDTO) throws URISyntaxException {
+        log.debug("REST request to update Department : {}", departmentDTO);
+        if (departmentDTO.getId() == null) {
+            return createDepartment(departmentDTO);
         }
-        Department result = departmentRepository.save(department);
+        DepartmentDTO result = departmentService.save(departmentDTO);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert("department", department.getId().toString()))
+            .headers(HeaderUtil.createEntityUpdateAlert("department", departmentDTO.getId().toString()))
             .body(result);
     }
 
@@ -85,26 +85,25 @@ public class DepartmentResource {
         method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public List<Department> getAllDepartments() {
+    public List<DepartmentDTO> getAllDepartments() {
         log.debug("REST request to get all Departments");
-        List<Department> departments = departmentRepository.findAll();
-        return departments;
+        return departmentService.findAll();
     }
 
     /**
      * GET  /departments/:id : get the "id" department.
      *
-     * @param id the id of the department to retrieve
-     * @return the ResponseEntity with status 200 (OK) and with body the department, or with status 404 (Not Found)
+     * @param id the id of the departmentDTO to retrieve
+     * @return the ResponseEntity with status 200 (OK) and with body the departmentDTO, or with status 404 (Not Found)
      */
     @RequestMapping(value = "/departments/{id}",
         method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Department> getDepartment(@PathVariable Long id) {
+    public ResponseEntity<DepartmentDTO> getDepartment(@PathVariable Long id) {
         log.debug("REST request to get Department : {}", id);
-        Department department = departmentRepository.findOne(id);
-        return Optional.ofNullable(department)
+        DepartmentDTO departmentDTO = departmentService.findOne(id);
+        return Optional.ofNullable(departmentDTO)
             .map(result -> new ResponseEntity<>(
                 result,
                 HttpStatus.OK))
@@ -114,7 +113,7 @@ public class DepartmentResource {
     /**
      * DELETE  /departments/:id : delete the "id" department.
      *
-     * @param id the id of the department to delete
+     * @param id the id of the departmentDTO to delete
      * @return the ResponseEntity with status 200 (OK)
      */
     @RequestMapping(value = "/departments/{id}",
@@ -123,7 +122,7 @@ public class DepartmentResource {
     @Timed
     public ResponseEntity<Void> deleteDepartment(@PathVariable Long id) {
         log.debug("REST request to delete Department : {}", id);
-        departmentRepository.delete(id);
+        departmentService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("department", id.toString())).build();
     }
 

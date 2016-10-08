@@ -18,9 +18,6 @@ public class Region implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "region_id")
-    private Long regionId;
-
     @Column(name = "region_name")
     private String regionName;
 
@@ -30,19 +27,6 @@ public class Region implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Long getRegionId() {
-        return regionId;
-    }
-
-    public Region regionId(Long regionId) {
-        this.regionId = regionId;
-        return this;
-    }
-
-    public void setRegionId(Long regionId) {
-        this.regionId = regionId;
     }
 
     public String getRegionName() {
@@ -82,7 +66,6 @@ public class Region implements Serializable {
     public String toString() {
         return "Region{" +
             "id=" + id +
-            ", regionId='" + regionId + "'" +
             ", regionName='" + regionName + "'" +
             '}';
     }

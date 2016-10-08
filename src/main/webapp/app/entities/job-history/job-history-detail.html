@@ -12,17 +12,21 @@
         <dd>
             <span>{{vm.jobHistory.endDate | date:'medium'}}</span>
         </dd>
-        <dt><span>Department</span></dt>
+        <dt><span>Language</span></dt>
         <dd>
-            <a ui-sref="department-detail({id:vm.jobHistory.department.id})">{{vm.jobHistory.department.id}}</a>
+            <span>{{vm.jobHistory.language}}</span>
         </dd>
         <dt><span>Job</span></dt>
         <dd>
-            <a ui-sref="job-detail({id:vm.jobHistory.job.id})">{{vm.jobHistory.job.id}}</a>
+            <a ui-sref="job-detail({id:vm.jobHistory.jobId})">{{vm.jobHistory.jobId}}</a>
+        </dd>
+        <dt><span>Department</span></dt>
+        <dd>
+            <a ui-sref="department-detail({id:vm.jobHistory.departmentId})">{{vm.jobHistory.departmentId}}</a>
         </dd>
         <dt><span>Employee</span></dt>
         <dd>
-            <a ui-sref="employee-detail({id:vm.jobHistory.employee.id})">{{vm.jobHistory.employee.id}}</a>
+            <a ui-sref="employee-detail({id:vm.jobHistory.employeeId})">{{vm.jobHistory.employeeId}}</a>
         </dd>
     </dl>
 

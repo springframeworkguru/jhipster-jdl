@@ -3,6 +3,9 @@ package guru.springframework.web.rest;
 import guru.springframework.JdlDemoApp;
 import guru.springframework.domain.Department;
 import guru.springframework.repository.DepartmentRepository;
+import guru.springframework.service.DepartmentService;
+import guru.springframework.service.dto.DepartmentDTO;
+import guru.springframework.service.mapper.DepartmentMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,14 +40,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = JdlDemoApp.class)
 
 public class DepartmentResourceIntTest {
-
-    private static final Long DEFAULT_DEPARTMENT_ID = 1L;
-    private static final Long UPDATED_DEPARTMENT_ID = 2L;
     private static final String DEFAULT_DEPARTMENT_NAME = "AAAAA";
     private static final String UPDATED_DEPARTMENT_NAME = "BBBBB";
 
     @Inject
     private DepartmentRepository departmentRepository;
+
+    @Inject
+    private DepartmentMapper departmentMapper;
+
+    @Inject
+    private DepartmentService departmentService;
 
     @Inject
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -63,7 +69,7 @@ public class DepartmentResourceIntTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
         DepartmentResource departmentResource = new DepartmentResource();
-        ReflectionTestUtils.setField(departmentResource, "departmentRepository", departmentRepository);
+        ReflectionTestUtils.setField(departmentResource, "departmentService", departmentService);
         this.restDepartmentMockMvc = MockMvcBuilders.standaloneSetup(departmentResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setMessageConverters(jacksonMessageConverter).build();
@@ -77,7 +83,6 @@ public class DepartmentResourceIntTest {
      */
     public static Department createEntity(EntityManager em) {
         Department department = new Department()
-                .departmentId(DEFAULT_DEPARTMENT_ID)
                 .departmentName(DEFAULT_DEPARTMENT_NAME);
         return department;
     }
@@ -93,17 +98,17 @@ public class DepartmentResourceIntTest {
         int databaseSizeBeforeCreate = departmentRepository.findAll().size();
 
         // Create the Department
+        DepartmentDTO departmentDTO = departmentMapper.departmentToDepartmentDTO(department);
 
         restDepartmentMockMvc.perform(post("/api/departments")
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                .content(TestUtil.convertObjectToJsonBytes(department)))
+                .content(TestUtil.convertObjectToJsonBytes(departmentDTO)))
                 .andExpect(status().isCreated());
 
         // Validate the Department in the database
         List<Department> departments = departmentRepository.findAll();
         assertThat(departments).hasSize(databaseSizeBeforeCreate + 1);
         Department testDepartment = departments.get(departments.size() - 1);
-        assertThat(testDepartment.getDepartmentId()).isEqualTo(DEFAULT_DEPARTMENT_ID);
         assertThat(testDepartment.getDepartmentName()).isEqualTo(DEFAULT_DEPARTMENT_NAME);
     }
 
@@ -115,10 +120,11 @@ public class DepartmentResourceIntTest {
         department.setDepartmentName(null);
 
         // Create the Department, which fails.
+        DepartmentDTO departmentDTO = departmentMapper.departmentToDepartmentDTO(department);
 
         restDepartmentMockMvc.perform(post("/api/departments")
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                .content(TestUtil.convertObjectToJsonBytes(department)))
+                .content(TestUtil.convertObjectToJsonBytes(departmentDTO)))
                 .andExpect(status().isBadRequest());
 
         List<Department> departments = departmentRepository.findAll();
@@ -136,7 +142,6 @@ public class DepartmentResourceIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.[*].id").value(hasItem(department.getId().intValue())))
-                .andExpect(jsonPath("$.[*].departmentId").value(hasItem(DEFAULT_DEPARTMENT_ID.intValue())))
                 .andExpect(jsonPath("$.[*].departmentName").value(hasItem(DEFAULT_DEPARTMENT_NAME.toString())));
     }
 
@@ -151,7 +156,6 @@ public class DepartmentResourceIntTest {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(department.getId().intValue()))
-            .andExpect(jsonPath("$.departmentId").value(DEFAULT_DEPARTMENT_ID.intValue()))
             .andExpect(jsonPath("$.departmentName").value(DEFAULT_DEPARTMENT_NAME.toString()));
     }
 
@@ -173,19 +177,18 @@ public class DepartmentResourceIntTest {
         // Update the department
         Department updatedDepartment = departmentRepository.findOne(department.getId());
         updatedDepartment
-                .departmentId(UPDATED_DEPARTMENT_ID)
                 .departmentName(UPDATED_DEPARTMENT_NAME);
+        DepartmentDTO departmentDTO = departmentMapper.departmentToDepartmentDTO(updatedDepartment);
 
         restDepartmentMockMvc.perform(put("/api/departments")
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                .content(TestUtil.convertObjectToJsonBytes(updatedDepartment)))
+                .content(TestUtil.convertObjectToJsonBytes(departmentDTO)))
                 .andExpect(status().isOk());
 
         // Validate the Department in the database
         List<Department> departments = departmentRepository.findAll();
         assertThat(departments).hasSize(databaseSizeBeforeUpdate);
         Department testDepartment = departments.get(departments.size() - 1);
-        assertThat(testDepartment.getDepartmentId()).isEqualTo(UPDATED_DEPARTMENT_ID);
         assertThat(testDepartment.getDepartmentName()).isEqualTo(UPDATED_DEPARTMENT_NAME);
     }
 

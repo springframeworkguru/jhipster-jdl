@@ -15,10 +15,10 @@
         vm.save = save;
         vm.locations = Location.query({filter: 'department-is-null'});
         $q.all([vm.department.$promise, vm.locations.$promise]).then(function() {
-            if (!vm.department.location || !vm.department.location.id) {
+            if (!vm.department.locationId) {
                 return $q.reject();
             }
-            return Location.get({id : vm.department.location.id}).$promise;
+            return Location.get({id : vm.department.locationId}).$promise;
         }).then(function(location) {
             vm.locations.push(location);
         });

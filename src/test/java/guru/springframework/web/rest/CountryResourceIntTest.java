@@ -3,6 +3,9 @@ package guru.springframework.web.rest;
 import guru.springframework.JdlDemoApp;
 import guru.springframework.domain.Country;
 import guru.springframework.repository.CountryRepository;
+import guru.springframework.service.CountryService;
+import guru.springframework.service.dto.CountryDTO;
+import guru.springframework.service.mapper.CountryMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,14 +40,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = JdlDemoApp.class)
 
 public class CountryResourceIntTest {
-
-    private static final Long DEFAULT_COUNTRY_ID = 1L;
-    private static final Long UPDATED_COUNTRY_ID = 2L;
     private static final String DEFAULT_COUNTRY_NAME = "AAAAA";
     private static final String UPDATED_COUNTRY_NAME = "BBBBB";
 
     @Inject
     private CountryRepository countryRepository;
+
+    @Inject
+    private CountryMapper countryMapper;
+
+    @Inject
+    private CountryService countryService;
 
     @Inject
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -63,7 +69,7 @@ public class CountryResourceIntTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
         CountryResource countryResource = new CountryResource();
-        ReflectionTestUtils.setField(countryResource, "countryRepository", countryRepository);
+        ReflectionTestUtils.setField(countryResource, "countryService", countryService);
         this.restCountryMockMvc = MockMvcBuilders.standaloneSetup(countryResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setMessageConverters(jacksonMessageConverter).build();
@@ -77,7 +83,6 @@ public class CountryResourceIntTest {
      */
     public static Country createEntity(EntityManager em) {
         Country country = new Country()
-                .countryId(DEFAULT_COUNTRY_ID)
                 .countryName(DEFAULT_COUNTRY_NAME);
         return country;
     }
@@ -93,17 +98,17 @@ public class CountryResourceIntTest {
         int databaseSizeBeforeCreate = countryRepository.findAll().size();
 
         // Create the Country
+        CountryDTO countryDTO = countryMapper.countryToCountryDTO(country);
 
         restCountryMockMvc.perform(post("/api/countries")
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                .content(TestUtil.convertObjectToJsonBytes(country)))
+                .content(TestUtil.convertObjectToJsonBytes(countryDTO)))
                 .andExpect(status().isCreated());
 
         // Validate the Country in the database
         List<Country> countries = countryRepository.findAll();
         assertThat(countries).hasSize(databaseSizeBeforeCreate + 1);
         Country testCountry = countries.get(countries.size() - 1);
-        assertThat(testCountry.getCountryId()).isEqualTo(DEFAULT_COUNTRY_ID);
         assertThat(testCountry.getCountryName()).isEqualTo(DEFAULT_COUNTRY_NAME);
     }
 
@@ -118,7 +123,6 @@ public class CountryResourceIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.[*].id").value(hasItem(country.getId().intValue())))
-                .andExpect(jsonPath("$.[*].countryId").value(hasItem(DEFAULT_COUNTRY_ID.intValue())))
                 .andExpect(jsonPath("$.[*].countryName").value(hasItem(DEFAULT_COUNTRY_NAME.toString())));
     }
 
@@ -133,7 +137,6 @@ public class CountryResourceIntTest {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(country.getId().intValue()))
-            .andExpect(jsonPath("$.countryId").value(DEFAULT_COUNTRY_ID.intValue()))
             .andExpect(jsonPath("$.countryName").value(DEFAULT_COUNTRY_NAME.toString()));
     }
 
@@ -155,19 +158,18 @@ public class CountryResourceIntTest {
         // Update the country
         Country updatedCountry = countryRepository.findOne(country.getId());
         updatedCountry
-                .countryId(UPDATED_COUNTRY_ID)
                 .countryName(UPDATED_COUNTRY_NAME);
+        CountryDTO countryDTO = countryMapper.countryToCountryDTO(updatedCountry);
 
         restCountryMockMvc.perform(put("/api/countries")
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                .content(TestUtil.convertObjectToJsonBytes(updatedCountry)))
+                .content(TestUtil.convertObjectToJsonBytes(countryDTO)))
                 .andExpect(status().isOk());
 
         // Validate the Country in the database
         List<Country> countries = countryRepository.findAll();
         assertThat(countries).hasSize(databaseSizeBeforeUpdate);
         Country testCountry = countries.get(countries.size() - 1);
-        assertThat(testCountry.getCountryId()).isEqualTo(UPDATED_COUNTRY_ID);
         assertThat(testCountry.getCountryName()).isEqualTo(UPDATED_COUNTRY_NAME);
     }
 

@@ -67,7 +67,7 @@ class DepartmentGatlingTest extends Simulation {
             .exec(http("Create new department")
             .post("/api/departments")
             .headers(headers_http_authenticated)
-            .body(StringBody("""{"id":null, "departmentId":null, "departmentName":"SAMPLE_TEXT"}""")).asJSON
+            .body(StringBody("""{"id":null, "departmentName":"SAMPLE_TEXT"}""")).asJSON
             .check(status.is(201))
             .check(headerRegex("Location", "(.*)").saveAs("new_department_url"))).exitHereIfFailed
             .pause(10)

@@ -95,11 +95,11 @@
                     resolve: {
                         entity: function () {
                             return {
-                                locationId: null,
                                 streetAddress: null,
                                 postalCode: null,
                                 city: null,
                                 stateProvince: null,
+                                country: null,
                                 id: null
                             };
                         }

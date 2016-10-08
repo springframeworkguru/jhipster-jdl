@@ -3,6 +3,8 @@ package guru.springframework.web.rest;
 import guru.springframework.JdlDemoApp;
 import guru.springframework.domain.Job;
 import guru.springframework.repository.JobRepository;
+import guru.springframework.service.dto.JobDTO;
+import guru.springframework.service.mapper.JobMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,9 +39,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = JdlDemoApp.class)
 
 public class JobResourceIntTest {
-
-    private static final Long DEFAULT_JOB_ID = 1L;
-    private static final Long UPDATED_JOB_ID = 2L;
     private static final String DEFAULT_JOB_TITLE = "AAAAA";
     private static final String UPDATED_JOB_TITLE = "BBBBB";
 
@@ -51,6 +50,9 @@ public class JobResourceIntTest {
 
     @Inject
     private JobRepository jobRepository;
+
+    @Inject
+    private JobMapper jobMapper;
 
     @Inject
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -70,6 +72,7 @@ public class JobResourceIntTest {
         MockitoAnnotations.initMocks(this);
         JobResource jobResource = new JobResource();
         ReflectionTestUtils.setField(jobResource, "jobRepository", jobRepository);
+        ReflectionTestUtils.setField(jobResource, "jobMapper", jobMapper);
         this.restJobMockMvc = MockMvcBuilders.standaloneSetup(jobResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setMessageConverters(jacksonMessageConverter).build();
@@ -83,7 +86,6 @@ public class JobResourceIntTest {
      */
     public static Job createEntity(EntityManager em) {
         Job job = new Job()
-                .jobId(DEFAULT_JOB_ID)
                 .jobTitle(DEFAULT_JOB_TITLE)
                 .minSalary(DEFAULT_MIN_SALARY)
                 .maxSalary(DEFAULT_MAX_SALARY);
@@ -101,17 +103,17 @@ public class JobResourceIntTest {
         int databaseSizeBeforeCreate = jobRepository.findAll().size();
 
         // Create the Job
+        JobDTO jobDTO = jobMapper.jobToJobDTO(job);
 
         restJobMockMvc.perform(post("/api/jobs")
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                .content(TestUtil.convertObjectToJsonBytes(job)))
+                .content(TestUtil.convertObjectToJsonBytes(jobDTO)))
                 .andExpect(status().isCreated());
 
         // Validate the Job in the database
         List<Job> jobs = jobRepository.findAll();
         assertThat(jobs).hasSize(databaseSizeBeforeCreate + 1);
         Job testJob = jobs.get(jobs.size() - 1);
-        assertThat(testJob.getJobId()).isEqualTo(DEFAULT_JOB_ID);
         assertThat(testJob.getJobTitle()).isEqualTo(DEFAULT_JOB_TITLE);
         assertThat(testJob.getMinSalary()).isEqualTo(DEFAULT_MIN_SALARY);
         assertThat(testJob.getMaxSalary()).isEqualTo(DEFAULT_MAX_SALARY);
@@ -128,7 +130,6 @@ public class JobResourceIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.[*].id").value(hasItem(job.getId().intValue())))
-                .andExpect(jsonPath("$.[*].jobId").value(hasItem(DEFAULT_JOB_ID.intValue())))
                 .andExpect(jsonPath("$.[*].jobTitle").value(hasItem(DEFAULT_JOB_TITLE.toString())))
                 .andExpect(jsonPath("$.[*].minSalary").value(hasItem(DEFAULT_MIN_SALARY.intValue())))
                 .andExpect(jsonPath("$.[*].maxSalary").value(hasItem(DEFAULT_MAX_SALARY.intValue())));
@@ -145,7 +146,6 @@ public class JobResourceIntTest {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(job.getId().intValue()))
-            .andExpect(jsonPath("$.jobId").value(DEFAULT_JOB_ID.intValue()))
             .andExpect(jsonPath("$.jobTitle").value(DEFAULT_JOB_TITLE.toString()))
             .andExpect(jsonPath("$.minSalary").value(DEFAULT_MIN_SALARY.intValue()))
             .andExpect(jsonPath("$.maxSalary").value(DEFAULT_MAX_SALARY.intValue()));
@@ -169,21 +169,20 @@ public class JobResourceIntTest {
         // Update the job
         Job updatedJob = jobRepository.findOne(job.getId());
         updatedJob
-                .jobId(UPDATED_JOB_ID)
                 .jobTitle(UPDATED_JOB_TITLE)
                 .minSalary(UPDATED_MIN_SALARY)
                 .maxSalary(UPDATED_MAX_SALARY);
+        JobDTO jobDTO = jobMapper.jobToJobDTO(updatedJob);
 
         restJobMockMvc.perform(put("/api/jobs")
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                .content(TestUtil.convertObjectToJsonBytes(updatedJob)))
+                .content(TestUtil.convertObjectToJsonBytes(jobDTO)))
                 .andExpect(status().isOk());
 
         // Validate the Job in the database
         List<Job> jobs = jobRepository.findAll();
         assertThat(jobs).hasSize(databaseSizeBeforeUpdate);
         Job testJob = jobs.get(jobs.size() - 1);
-        assertThat(testJob.getJobId()).isEqualTo(UPDATED_JOB_ID);
         assertThat(testJob.getJobTitle()).isEqualTo(UPDATED_JOB_TITLE);
         assertThat(testJob.getMinSalary()).isEqualTo(UPDATED_MIN_SALARY);
         assertThat(testJob.getMaxSalary()).isEqualTo(UPDATED_MAX_SALARY);

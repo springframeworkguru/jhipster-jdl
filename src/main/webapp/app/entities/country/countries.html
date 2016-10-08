@@ -19,7 +19,6 @@
             <thead>
                 <tr>
                     <th><span>ID</span></th>
-                    <th><span>Country Id</span></th>
                     <th><span>Country Name</span></th>
                     <th><span>Region</span></th>
                     <th></th>
@@ -28,10 +27,9 @@
             <tbody>
                 <tr ng-repeat="country in vm.countries track by country.id">
                     <td><a ui-sref="country-detail({id:country.id})">{{country.id}}</a></td>
-                    <td>{{country.countryId}}</td>
                     <td>{{country.countryName}}</td>
                     <td>
-                        <a ui-sref="region-detail({id:country.region.id})">{{country.region.id}}</a>
+                        <a ui-sref="region-detail({id:country.regionId})">{{country.regionId}}</a>
                     </td>
                     <td class="text-right">
                         <div class="btn-group flex-btn-group-container">

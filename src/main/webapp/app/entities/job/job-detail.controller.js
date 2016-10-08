@@ -5,9 +5,9 @@
         .module('jdlDemoApp')
         .controller('JobDetailController', JobDetailController);
 
-    JobDetailController.$inject = ['$scope', '$rootScope', '$stateParams', 'previousState', 'entity', 'Job', 'Task', 'Employee'];
+    JobDetailController.$inject = ['$scope', '$rootScope', '$stateParams', 'previousState', 'entity', 'Job', 'Employee', 'Task'];
 
-    function JobDetailController($scope, $rootScope, $stateParams, previousState, entity, Job, Task, Employee) {
+    function JobDetailController($scope, $rootScope, $stateParams, previousState, entity, Job, Employee, Task) {
         var vm = this;
 
         vm.job = entity;

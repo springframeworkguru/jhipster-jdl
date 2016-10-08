@@ -15,10 +15,10 @@
         vm.save = save;
         vm.regions = Region.query({filter: 'country-is-null'});
         $q.all([vm.country.$promise, vm.regions.$promise]).then(function() {
-            if (!vm.country.region || !vm.country.region.id) {
+            if (!vm.country.regionId) {
                 return $q.reject();
             }
-            return Region.get({id : vm.country.region.id}).$promise;
+            return Region.get({id : vm.country.regionId}).$promise;
         }).then(function(region) {
             vm.regions.push(region);
         });

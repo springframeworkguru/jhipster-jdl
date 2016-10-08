@@ -95,7 +95,6 @@
                     resolve: {
                         entity: function () {
                             return {
-                                taskId: null,
                                 title: null,
                                 description: null,
                                 id: null

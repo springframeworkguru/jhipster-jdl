@@ -3,6 +3,9 @@ package guru.springframework.web.rest;
 import guru.springframework.JdlDemoApp;
 import guru.springframework.domain.Task;
 import guru.springframework.repository.TaskRepository;
+import guru.springframework.service.TaskService;
+import guru.springframework.service.dto.TaskDTO;
+import guru.springframework.service.mapper.TaskMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,9 +40,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = JdlDemoApp.class)
 
 public class TaskResourceIntTest {
-
-    private static final Long DEFAULT_TASK_ID = 1L;
-    private static final Long UPDATED_TASK_ID = 2L;
     private static final String DEFAULT_TITLE = "AAAAA";
     private static final String UPDATED_TITLE = "BBBBB";
     private static final String DEFAULT_DESCRIPTION = "AAAAA";
@@ -47,6 +47,12 @@ public class TaskResourceIntTest {
 
     @Inject
     private TaskRepository taskRepository;
+
+    @Inject
+    private TaskMapper taskMapper;
+
+    @Inject
+    private TaskService taskService;
 
     @Inject
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -65,7 +71,7 @@ public class TaskResourceIntTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
         TaskResource taskResource = new TaskResource();
-        ReflectionTestUtils.setField(taskResource, "taskRepository", taskRepository);
+        ReflectionTestUtils.setField(taskResource, "taskService", taskService);
         this.restTaskMockMvc = MockMvcBuilders.standaloneSetup(taskResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setMessageConverters(jacksonMessageConverter).build();
@@ -79,7 +85,6 @@ public class TaskResourceIntTest {
      */
     public static Task createEntity(EntityManager em) {
         Task task = new Task()
-                .taskId(DEFAULT_TASK_ID)
                 .title(DEFAULT_TITLE)
                 .description(DEFAULT_DESCRIPTION);
         return task;
@@ -96,17 +101,17 @@ public class TaskResourceIntTest {
         int databaseSizeBeforeCreate = taskRepository.findAll().size();
 
         // Create the Task
+        TaskDTO taskDTO = taskMapper.taskToTaskDTO(task);
 
         restTaskMockMvc.perform(post("/api/tasks")
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                .content(TestUtil.convertObjectToJsonBytes(task)))
+                .content(TestUtil.convertObjectToJsonBytes(taskDTO)))
                 .andExpect(status().isCreated());
 
         // Validate the Task in the database
         List<Task> tasks = taskRepository.findAll();
         assertThat(tasks).hasSize(databaseSizeBeforeCreate + 1);
         Task testTask = tasks.get(tasks.size() - 1);
-        assertThat(testTask.getTaskId()).isEqualTo(DEFAULT_TASK_ID);
         assertThat(testTask.getTitle()).isEqualTo(DEFAULT_TITLE);
         assertThat(testTask.getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
     }
@@ -122,7 +127,6 @@ public class TaskResourceIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.[*].id").value(hasItem(task.getId().intValue())))
-                .andExpect(jsonPath("$.[*].taskId").value(hasItem(DEFAULT_TASK_ID.intValue())))
                 .andExpect(jsonPath("$.[*].title").value(hasItem(DEFAULT_TITLE.toString())))
                 .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION.toString())));
     }
@@ -138,7 +142,6 @@ public class TaskResourceIntTest {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(task.getId().intValue()))
-            .andExpect(jsonPath("$.taskId").value(DEFAULT_TASK_ID.intValue()))
             .andExpect(jsonPath("$.title").value(DEFAULT_TITLE.toString()))
             .andExpect(jsonPath("$.description").value(DEFAULT_DESCRIPTION.toString()));
     }
@@ -161,20 +164,19 @@ public class TaskResourceIntTest {
         // Update the task
         Task updatedTask = taskRepository.findOne(task.getId());
         updatedTask
-                .taskId(UPDATED_TASK_ID)
                 .title(UPDATED_TITLE)
                 .description(UPDATED_DESCRIPTION);
+        TaskDTO taskDTO = taskMapper.taskToTaskDTO(updatedTask);
 
         restTaskMockMvc.perform(put("/api/tasks")
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                .content(TestUtil.convertObjectToJsonBytes(updatedTask)))
+                .content(TestUtil.convertObjectToJsonBytes(taskDTO)))
                 .andExpect(status().isOk());
 
         // Validate the Task in the database
         List<Task> tasks = taskRepository.findAll();
         assertThat(tasks).hasSize(databaseSizeBeforeUpdate);
         Task testTask = tasks.get(tasks.size() - 1);
-        assertThat(testTask.getTaskId()).isEqualTo(UPDATED_TASK_ID);
         assertThat(testTask.getTitle()).isEqualTo(UPDATED_TITLE);
         assertThat(testTask.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
     }

@@ -115,7 +115,6 @@
                     resolve: {
                         entity: function () {
                             return {
-                                jobId: null,
                                 jobTitle: null,
                                 minSalary: null,
                                 maxSalary: null,

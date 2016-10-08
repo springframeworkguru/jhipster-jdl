@@ -5,9 +5,9 @@
         .module('jdlDemoApp')
         .controller('JobHistoryDialogController', JobHistoryDialogController);
 
-    JobHistoryDialogController.$inject = ['$timeout', '$scope', '$stateParams', '$uibModalInstance', '$q', 'entity', 'JobHistory', 'Department', 'Job', 'Employee'];
+    JobHistoryDialogController.$inject = ['$timeout', '$scope', '$stateParams', '$uibModalInstance', '$q', 'entity', 'JobHistory', 'Job', 'Department', 'Employee'];
 
-    function JobHistoryDialogController ($timeout, $scope, $stateParams, $uibModalInstance, $q, entity, JobHistory, Department, Job, Employee) {
+    function JobHistoryDialogController ($timeout, $scope, $stateParams, $uibModalInstance, $q, entity, JobHistory, Job, Department, Employee) {
         var vm = this;
 
         vm.jobHistory = entity;
@@ -15,30 +15,30 @@
         vm.datePickerOpenStatus = {};
         vm.openCalendar = openCalendar;
         vm.save = save;
-        vm.departments = Department.query({filter: 'jobhistory-is-null'});
-        $q.all([vm.jobHistory.$promise, vm.departments.$promise]).then(function() {
-            if (!vm.jobHistory.department || !vm.jobHistory.department.id) {
-                return $q.reject();
-            }
-            return Department.get({id : vm.jobHistory.department.id}).$promise;
-        }).then(function(department) {
-            vm.departments.push(department);
-        });
         vm.jobs = Job.query({filter: 'jobhistory-is-null'});
         $q.all([vm.jobHistory.$promise, vm.jobs.$promise]).then(function() {
-            if (!vm.jobHistory.job || !vm.jobHistory.job.id) {
+            if (!vm.jobHistory.jobId) {
                 return $q.reject();
             }
-            return Job.get({id : vm.jobHistory.job.id}).$promise;
+            return Job.get({id : vm.jobHistory.jobId}).$promise;
         }).then(function(job) {
             vm.jobs.push(job);
         });
-        vm.employees = Employee.query({filter: 'jobhistory-is-null'});
-        $q.all([vm.jobHistory.$promise, vm.employees.$promise]).then(function() {
-            if (!vm.jobHistory.employee || !vm.jobHistory.employee.id) {
+        vm.departments = Department.query({filter: 'jobhistory-is-null'});
+        $q.all([vm.jobHistory.$promise, vm.departments.$promise]).then(function() {
+            if (!vm.jobHistory.departmentId) {
                 return $q.reject();
             }
-            return Employee.get({id : vm.jobHistory.employee.id}).$promise;
+            return Department.get({id : vm.jobHistory.departmentId}).$promise;
+        }).then(function(department) {
+            vm.departments.push(department);
+        });
+        vm.employees = Employee.query({filter: 'jobhistory-is-null'});
+        $q.all([vm.jobHistory.$promise, vm.employees.$promise]).then(function() {
+            if (!vm.jobHistory.employeeId) {
+                return $q.reject();
+            }
+            return Employee.get({id : vm.jobHistory.employeeId}).$promise;
         }).then(function(employee) {
             vm.employees.push(employee);
         });

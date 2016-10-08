@@ -1,8 +1,8 @@
 package guru.springframework.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
-import guru.springframework.domain.Region;
-import guru.springframework.repository.RegionRepository;
+import guru.springframework.service.RegionService;
+import guru.springframework.service.dto.RegionDTO;
 import guru.springframework.web.rest.util.HeaderUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,25 +27,25 @@ public class RegionResource {
     private final Logger log = LoggerFactory.getLogger(RegionResource.class);
 
     @Inject
-    private RegionRepository regionRepository;
+    private RegionService regionService;
 
     /**
      * POST  /regions : Create a new region.
      *
-     * @param region the region to create
-     * @return the ResponseEntity with status 201 (Created) and with body the new region, or with status 400 (Bad Request) if the region has already an ID
+     * @param regionDTO the regionDTO to create
+     * @return the ResponseEntity with status 201 (Created) and with body the new regionDTO, or with status 400 (Bad Request) if the region has already an ID
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @RequestMapping(value = "/regions",
         method = RequestMethod.POST,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Region> createRegion(@RequestBody Region region) throws URISyntaxException {
-        log.debug("REST request to save Region : {}", region);
-        if (region.getId() != null) {
+    public ResponseEntity<RegionDTO> createRegion(@RequestBody RegionDTO regionDTO) throws URISyntaxException {
+        log.debug("REST request to save Region : {}", regionDTO);
+        if (regionDTO.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("region", "idexists", "A new region cannot already have an ID")).body(null);
         }
-        Region result = regionRepository.save(region);
+        RegionDTO result = regionService.save(regionDTO);
         return ResponseEntity.created(new URI("/api/regions/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert("region", result.getId().toString()))
             .body(result);
@@ -54,24 +54,24 @@ public class RegionResource {
     /**
      * PUT  /regions : Updates an existing region.
      *
-     * @param region the region to update
-     * @return the ResponseEntity with status 200 (OK) and with body the updated region,
-     * or with status 400 (Bad Request) if the region is not valid,
-     * or with status 500 (Internal Server Error) if the region couldnt be updated
+     * @param regionDTO the regionDTO to update
+     * @return the ResponseEntity with status 200 (OK) and with body the updated regionDTO,
+     * or with status 400 (Bad Request) if the regionDTO is not valid,
+     * or with status 500 (Internal Server Error) if the regionDTO couldnt be updated
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @RequestMapping(value = "/regions",
         method = RequestMethod.PUT,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Region> updateRegion(@RequestBody Region region) throws URISyntaxException {
-        log.debug("REST request to update Region : {}", region);
-        if (region.getId() == null) {
-            return createRegion(region);
+    public ResponseEntity<RegionDTO> updateRegion(@RequestBody RegionDTO regionDTO) throws URISyntaxException {
+        log.debug("REST request to update Region : {}", regionDTO);
+        if (regionDTO.getId() == null) {
+            return createRegion(regionDTO);
         }
-        Region result = regionRepository.save(region);
+        RegionDTO result = regionService.save(regionDTO);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert("region", region.getId().toString()))
+            .headers(HeaderUtil.createEntityUpdateAlert("region", regionDTO.getId().toString()))
             .body(result);
     }
 
@@ -84,26 +84,25 @@ public class RegionResource {
         method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public List<Region> getAllRegions() {
+    public List<RegionDTO> getAllRegions() {
         log.debug("REST request to get all Regions");
-        List<Region> regions = regionRepository.findAll();
-        return regions;
+        return regionService.findAll();
     }
 
     /**
      * GET  /regions/:id : get the "id" region.
      *
-     * @param id the id of the region to retrieve
-     * @return the ResponseEntity with status 200 (OK) and with body the region, or with status 404 (Not Found)
+     * @param id the id of the regionDTO to retrieve
+     * @return the ResponseEntity with status 200 (OK) and with body the regionDTO, or with status 404 (Not Found)
      */
     @RequestMapping(value = "/regions/{id}",
         method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Region> getRegion(@PathVariable Long id) {
+    public ResponseEntity<RegionDTO> getRegion(@PathVariable Long id) {
         log.debug("REST request to get Region : {}", id);
-        Region region = regionRepository.findOne(id);
-        return Optional.ofNullable(region)
+        RegionDTO regionDTO = regionService.findOne(id);
+        return Optional.ofNullable(regionDTO)
             .map(result -> new ResponseEntity<>(
                 result,
                 HttpStatus.OK))
@@ -113,7 +112,7 @@ public class RegionResource {
     /**
      * DELETE  /regions/:id : delete the "id" region.
      *
-     * @param id the id of the region to delete
+     * @param id the id of the regionDTO to delete
      * @return the ResponseEntity with status 200 (OK)
      */
     @RequestMapping(value = "/regions/{id}",
@@ -122,7 +121,7 @@ public class RegionResource {
     @Timed
     public ResponseEntity<Void> deleteRegion(@PathVariable Long id) {
         log.debug("REST request to delete Region : {}", id);
-        regionRepository.delete(id);
+        regionService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("region", id.toString())).build();
     }
 

@@ -12,8 +12,6 @@ public class EmployeeDTO implements Serializable {
 
     private Long id;
 
-    private Long employeeId;
-
     private String firstName;
 
     private String lastName;
@@ -39,13 +37,6 @@ public class EmployeeDTO implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
-    public Long getEmployeeId() {
-        return employeeId;
-    }
-
-    public void setEmployeeId(Long employeeId) {
-        this.employeeId = employeeId;
     }
     public String getFirstName() {
         return firstName;
@@ -138,7 +129,6 @@ public class EmployeeDTO implements Serializable {
     public String toString() {
         return "EmployeeDTO{" +
             "id=" + id +
-            ", employeeId='" + employeeId + "'" +
             ", firstName='" + firstName + "'" +
             ", lastName='" + lastName + "'" +
             ", email='" + email + "'" +

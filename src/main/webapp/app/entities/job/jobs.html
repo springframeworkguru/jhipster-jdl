@@ -19,23 +19,21 @@
             <thead>
                 <tr jh-sort="vm.predicate" ascending="vm.reverse" callback="vm.transition()">
                     <th jh-sort-by="id"><span>ID</span> <span class="glyphicon glyphicon-sort"></span></th>
-                    <th jh-sort-by="jobId"><span>Job Id</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th jh-sort-by="jobTitle"><span>Job Title</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th jh-sort-by="minSalary"><span>Min Salary</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th jh-sort-by="maxSalary"><span>Max Salary</span> <span class="glyphicon glyphicon-sort"></span></th>
-                    <th jh-sort-by="employee.id"><span>Employee</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="employeeId"><span>Employee</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
                 <tr ng-repeat="job in vm.jobs track by job.id">
                     <td><a ui-sref="job-detail({id:job.id})">{{job.id}}</a></td>
-                    <td>{{job.jobId}}</td>
                     <td>{{job.jobTitle}}</td>
                     <td>{{job.minSalary}}</td>
                     <td>{{job.maxSalary}}</td>
                     <td>
-                        <a ui-sref="employee-detail({id:job.employee.id})">{{job.employee.id}}</a>
+                        <a ui-sref="employee-detail({id:job.employeeId})">{{job.employeeId}}</a>
                     </td>
                     <td class="text-right">
                         <div class="btn-group flex-btn-group-container">

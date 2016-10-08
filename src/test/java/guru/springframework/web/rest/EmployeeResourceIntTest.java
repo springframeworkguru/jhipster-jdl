@@ -3,7 +3,6 @@ package guru.springframework.web.rest;
 import guru.springframework.JdlDemoApp;
 import guru.springframework.domain.Employee;
 import guru.springframework.repository.EmployeeRepository;
-import guru.springframework.service.EmployeeService;
 import guru.springframework.service.dto.EmployeeDTO;
 import guru.springframework.service.mapper.EmployeeMapper;
 import org.junit.Before;
@@ -45,9 +44,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class EmployeeResourceIntTest {
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").withZone(ZoneId.of("Z"));
-
-    private static final Long DEFAULT_EMPLOYEE_ID = 1L;
-    private static final Long UPDATED_EMPLOYEE_ID = 2L;
     private static final String DEFAULT_FIRST_NAME = "AAAAA";
     private static final String UPDATED_FIRST_NAME = "BBBBB";
     private static final String DEFAULT_LAST_NAME = "AAAAA";
@@ -74,9 +70,6 @@ public class EmployeeResourceIntTest {
     private EmployeeMapper employeeMapper;
 
     @Inject
-    private EmployeeService employeeService;
-
-    @Inject
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
     @Inject
@@ -93,7 +86,8 @@ public class EmployeeResourceIntTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
         EmployeeResource employeeResource = new EmployeeResource();
-        ReflectionTestUtils.setField(employeeResource, "employeeService", employeeService);
+        ReflectionTestUtils.setField(employeeResource, "employeeRepository", employeeRepository);
+        ReflectionTestUtils.setField(employeeResource, "employeeMapper", employeeMapper);
         this.restEmployeeMockMvc = MockMvcBuilders.standaloneSetup(employeeResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setMessageConverters(jacksonMessageConverter).build();
@@ -107,7 +101,6 @@ public class EmployeeResourceIntTest {
      */
     public static Employee createEntity(EntityManager em) {
         Employee employee = new Employee()
-                .employeeId(DEFAULT_EMPLOYEE_ID)
                 .firstName(DEFAULT_FIRST_NAME)
                 .lastName(DEFAULT_LAST_NAME)
                 .email(DEFAULT_EMAIL)
@@ -140,7 +133,6 @@ public class EmployeeResourceIntTest {
         List<Employee> employees = employeeRepository.findAll();
         assertThat(employees).hasSize(databaseSizeBeforeCreate + 1);
         Employee testEmployee = employees.get(employees.size() - 1);
-        assertThat(testEmployee.getEmployeeId()).isEqualTo(DEFAULT_EMPLOYEE_ID);
         assertThat(testEmployee.getFirstName()).isEqualTo(DEFAULT_FIRST_NAME);
         assertThat(testEmployee.getLastName()).isEqualTo(DEFAULT_LAST_NAME);
         assertThat(testEmployee.getEmail()).isEqualTo(DEFAULT_EMAIL);
@@ -161,7 +153,6 @@ public class EmployeeResourceIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.[*].id").value(hasItem(employee.getId().intValue())))
-                .andExpect(jsonPath("$.[*].employeeId").value(hasItem(DEFAULT_EMPLOYEE_ID.intValue())))
                 .andExpect(jsonPath("$.[*].firstName").value(hasItem(DEFAULT_FIRST_NAME.toString())))
                 .andExpect(jsonPath("$.[*].lastName").value(hasItem(DEFAULT_LAST_NAME.toString())))
                 .andExpect(jsonPath("$.[*].email").value(hasItem(DEFAULT_EMAIL.toString())))
@@ -182,7 +173,6 @@ public class EmployeeResourceIntTest {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(employee.getId().intValue()))
-            .andExpect(jsonPath("$.employeeId").value(DEFAULT_EMPLOYEE_ID.intValue()))
             .andExpect(jsonPath("$.firstName").value(DEFAULT_FIRST_NAME.toString()))
             .andExpect(jsonPath("$.lastName").value(DEFAULT_LAST_NAME.toString()))
             .andExpect(jsonPath("$.email").value(DEFAULT_EMAIL.toString()))
@@ -210,7 +200,6 @@ public class EmployeeResourceIntTest {
         // Update the employee
         Employee updatedEmployee = employeeRepository.findOne(employee.getId());
         updatedEmployee
-                .employeeId(UPDATED_EMPLOYEE_ID)
                 .firstName(UPDATED_FIRST_NAME)
                 .lastName(UPDATED_LAST_NAME)
                 .email(UPDATED_EMAIL)
@@ -229,7 +218,6 @@ public class EmployeeResourceIntTest {
         List<Employee> employees = employeeRepository.findAll();
         assertThat(employees).hasSize(databaseSizeBeforeUpdate);
         Employee testEmployee = employees.get(employees.size() - 1);
-        assertThat(testEmployee.getEmployeeId()).isEqualTo(UPDATED_EMPLOYEE_ID);
         assertThat(testEmployee.getFirstName()).isEqualTo(UPDATED_FIRST_NAME);
         assertThat(testEmployee.getLastName()).isEqualTo(UPDATED_LAST_NAME);
         assertThat(testEmployee.getEmail()).isEqualTo(UPDATED_EMAIL);

@@ -15,10 +15,10 @@
         vm.save = save;
         vm.countries = Country.query({filter: 'location-is-null'});
         $q.all([vm.location.$promise, vm.countries.$promise]).then(function() {
-            if (!vm.location.country || !vm.location.country.id) {
+            if (!vm.location.countryId) {
                 return $q.reject();
             }
-            return Country.get({id : vm.location.country.id}).$promise;
+            return Country.get({id : vm.location.countryId}).$promise;
         }).then(function(country) {
             vm.countries.push(country);
         });

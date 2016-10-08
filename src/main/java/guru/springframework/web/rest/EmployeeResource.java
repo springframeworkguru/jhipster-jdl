@@ -1,8 +1,10 @@
 package guru.springframework.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
-import guru.springframework.service.EmployeeService;
+import guru.springframework.domain.Employee;
+import guru.springframework.repository.EmployeeRepository;
 import guru.springframework.service.dto.EmployeeDTO;
+import guru.springframework.service.mapper.EmployeeMapper;
 import guru.springframework.web.rest.util.HeaderUtil;
 import guru.springframework.web.rest.util.PaginationUtil;
 import org.slf4j.Logger;
@@ -31,7 +33,10 @@ public class EmployeeResource {
     private final Logger log = LoggerFactory.getLogger(EmployeeResource.class);
 
     @Inject
-    private EmployeeService employeeService;
+    private EmployeeRepository employeeRepository;
+
+    @Inject
+    private EmployeeMapper employeeMapper;
 
     /**
      * POST  /employees : Create a new employee.
@@ -49,7 +54,9 @@ public class EmployeeResource {
         if (employeeDTO.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("employee", "idexists", "A new employee cannot already have an ID")).body(null);
         }
-        EmployeeDTO result = employeeService.save(employeeDTO);
+        Employee employee = employeeMapper.employeeDTOToEmployee(employeeDTO);
+        employee = employeeRepository.save(employee);
+        EmployeeDTO result = employeeMapper.employeeToEmployeeDTO(employee);
         return ResponseEntity.created(new URI("/api/employees/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert("employee", result.getId().toString()))
             .body(result);
@@ -73,7 +80,9 @@ public class EmployeeResource {
         if (employeeDTO.getId() == null) {
             return createEmployee(employeeDTO);
         }
-        EmployeeDTO result = employeeService.save(employeeDTO);
+        Employee employee = employeeMapper.employeeDTOToEmployee(employeeDTO);
+        employee = employeeRepository.save(employee);
+        EmployeeDTO result = employeeMapper.employeeToEmployeeDTO(employee);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert("employee", employeeDTO.getId().toString()))
             .body(result);
@@ -93,9 +102,9 @@ public class EmployeeResource {
     public ResponseEntity<List<EmployeeDTO>> getAllEmployees(Pageable pageable)
         throws URISyntaxException {
         log.debug("REST request to get a page of Employees");
-        Page<EmployeeDTO> page = employeeService.findAll(pageable);
+        Page<Employee> page = employeeRepository.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/employees");
-        return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+        return new ResponseEntity<>(employeeMapper.employeesToEmployeeDTOs(page.getContent()), headers, HttpStatus.OK);
     }
 
     /**
@@ -110,7 +119,8 @@ public class EmployeeResource {
     @Timed
     public ResponseEntity<EmployeeDTO> getEmployee(@PathVariable Long id) {
         log.debug("REST request to get Employee : {}", id);
-        EmployeeDTO employeeDTO = employeeService.findOne(id);
+        Employee employee = employeeRepository.findOne(id);
+        EmployeeDTO employeeDTO = employeeMapper.employeeToEmployeeDTO(employee);
         return Optional.ofNullable(employeeDTO)
             .map(result -> new ResponseEntity<>(
                 result,
@@ -130,7 +140,7 @@ public class EmployeeResource {
     @Timed
     public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
         log.debug("REST request to delete Employee : {}", id);
-        employeeService.delete(id);
+        employeeRepository.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("employee", id.toString())).build();
     }
 

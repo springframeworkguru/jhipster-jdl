@@ -33,22 +33,30 @@
                     </span>
                 </div>
         </div>
+        <div class="form-group">
+            <label class="control-label" for="field_language">Language</label>
+            <select class="form-control" name="language" ng-model="vm.jobHistory.language" id="field_language">
+                <option value="FRENCH">FRENCH</option>
+                <option value="ENGLISH">ENGLISH</option>
+                <option value="SPANISH">SPANISH</option>
+            </select>
+        </div>
 
         <div class="form-group">
-            <label for="field_department">Department</label>
-            <select class="form-control" id="field_department" name="department" ng-model="vm.jobHistory.department" ng-options="department as department.id for department in vm.departments | orderBy:'id' track by department.id">
+            <label for="field_job">Job</label>
+            <select class="form-control" id="field_job" name="job" ng-model="vm.jobHistory.jobId" ng-options="job.id as job.id for job in vm.jobs | orderBy:'id'">
                 <option value=""></option>
             </select>
         </div>
         <div class="form-group">
-            <label for="field_job">Job</label>
-            <select class="form-control" id="field_job" name="job" ng-model="vm.jobHistory.job" ng-options="job as job.id for job in vm.jobs | orderBy:'id' track by job.id">
+            <label for="field_department">Department</label>
+            <select class="form-control" id="field_department" name="department" ng-model="vm.jobHistory.departmentId" ng-options="department.id as department.id for department in vm.departments | orderBy:'id'">
                 <option value=""></option>
             </select>
         </div>
         <div class="form-group">
             <label for="field_employee">Employee</label>
-            <select class="form-control" id="field_employee" name="employee" ng-model="vm.jobHistory.employee" ng-options="employee as employee.id for employee in vm.employees | orderBy:'id' track by employee.id">
+            <select class="form-control" id="field_employee" name="employee" ng-model="vm.jobHistory.employeeId" ng-options="employee.id as employee.id for employee in vm.employees | orderBy:'id'">
                 <option value=""></option>
             </select>
         </div>

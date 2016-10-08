@@ -27,9 +27,6 @@ public class Employee implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "employee_id")
-    private Long employeeId;
-
     @Column(name = "first_name")
     private String firstName;
 
@@ -67,19 +64,6 @@ public class Employee implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Long getEmployeeId() {
-        return employeeId;
-    }
-
-    public Employee employeeId(Long employeeId) {
-        this.employeeId = employeeId;
-        return this;
-    }
-
-    public void setEmployeeId(Long employeeId) {
-        this.employeeId = employeeId;
     }
 
     public String getFirstName() {
@@ -248,7 +232,6 @@ public class Employee implements Serializable {
     public String toString() {
         return "Employee{" +
             "id=" + id +
-            ", employeeId='" + employeeId + "'" +
             ", firstName='" + firstName + "'" +
             ", lastName='" + lastName + "'" +
             ", email='" + email + "'" +

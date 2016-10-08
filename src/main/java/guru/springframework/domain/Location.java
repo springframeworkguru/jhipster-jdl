@@ -1,13 +1,18 @@
 package guru.springframework.domain;
 
+import io.swagger.annotations.ApiModel;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * A Location.
+ * not an ignored comment                                                      
+ * 
  */
+@ApiModel(description = ""
+    + "not an ignored comment                                                 "
+    + "")
 @Entity
 @Table(name = "location")
 public class Location implements Serializable {
@@ -17,9 +22,6 @@ public class Location implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
-    @Column(name = "location_id")
-    private Long locationId;
 
     @Column(name = "street_address")
     private String streetAddress;
@@ -33,6 +35,9 @@ public class Location implements Serializable {
     @Column(name = "state_province")
     private String stateProvince;
 
+    @Column(name = "country")
+    private String country;
+
     @OneToOne
     @JoinColumn(unique = true)
     private Country country;
@@ -43,19 +48,6 @@ public class Location implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Long getLocationId() {
-        return locationId;
-    }
-
-    public Location locationId(Long locationId) {
-        this.locationId = locationId;
-        return this;
-    }
-
-    public void setLocationId(Long locationId) {
-        this.locationId = locationId;
     }
 
     public String getStreetAddress() {
@@ -110,6 +102,19 @@ public class Location implements Serializable {
         this.stateProvince = stateProvince;
     }
 
+    public String getCountry() {
+        return country;
+    }
+
+    public Location country(String country) {
+        this.country = country;
+        return this;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
     public Country getCountry() {
         return country;
     }
@@ -147,11 +152,11 @@ public class Location implements Serializable {
     public String toString() {
         return "Location{" +
             "id=" + id +
-            ", locationId='" + locationId + "'" +
             ", streetAddress='" + streetAddress + "'" +
             ", postalCode='" + postalCode + "'" +
             ", city='" + city + "'" +
             ", stateProvince='" + stateProvince + "'" +
+            ", country='" + country + "'" +
             '}';
     }
 }

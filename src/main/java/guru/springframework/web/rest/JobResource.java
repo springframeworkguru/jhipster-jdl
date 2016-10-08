@@ -3,6 +3,8 @@ package guru.springframework.web.rest;
 import com.codahale.metrics.annotation.Timed;
 import guru.springframework.domain.Job;
 import guru.springframework.repository.JobRepository;
+import guru.springframework.service.dto.JobDTO;
+import guru.springframework.service.mapper.JobMapper;
 import guru.springframework.web.rest.util.HeaderUtil;
 import guru.springframework.web.rest.util.PaginationUtil;
 import org.slf4j.Logger;
@@ -33,23 +35,28 @@ public class JobResource {
     @Inject
     private JobRepository jobRepository;
 
+    @Inject
+    private JobMapper jobMapper;
+
     /**
      * POST  /jobs : Create a new job.
      *
-     * @param job the job to create
-     * @return the ResponseEntity with status 201 (Created) and with body the new job, or with status 400 (Bad Request) if the job has already an ID
+     * @param jobDTO the jobDTO to create
+     * @return the ResponseEntity with status 201 (Created) and with body the new jobDTO, or with status 400 (Bad Request) if the job has already an ID
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @RequestMapping(value = "/jobs",
         method = RequestMethod.POST,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Job> createJob(@RequestBody Job job) throws URISyntaxException {
-        log.debug("REST request to save Job : {}", job);
-        if (job.getId() != null) {
+    public ResponseEntity<JobDTO> createJob(@RequestBody JobDTO jobDTO) throws URISyntaxException {
+        log.debug("REST request to save Job : {}", jobDTO);
+        if (jobDTO.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("job", "idexists", "A new job cannot already have an ID")).body(null);
         }
-        Job result = jobRepository.save(job);
+        Job job = jobMapper.jobDTOToJob(jobDTO);
+        job = jobRepository.save(job);
+        JobDTO result = jobMapper.jobToJobDTO(job);
         return ResponseEntity.created(new URI("/api/jobs/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert("job", result.getId().toString()))
             .body(result);
@@ -58,24 +65,26 @@ public class JobResource {
     /**
      * PUT  /jobs : Updates an existing job.
      *
-     * @param job the job to update
-     * @return the ResponseEntity with status 200 (OK) and with body the updated job,
-     * or with status 400 (Bad Request) if the job is not valid,
-     * or with status 500 (Internal Server Error) if the job couldnt be updated
+     * @param jobDTO the jobDTO to update
+     * @return the ResponseEntity with status 200 (OK) and with body the updated jobDTO,
+     * or with status 400 (Bad Request) if the jobDTO is not valid,
+     * or with status 500 (Internal Server Error) if the jobDTO couldnt be updated
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @RequestMapping(value = "/jobs",
         method = RequestMethod.PUT,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Job> updateJob(@RequestBody Job job) throws URISyntaxException {
-        log.debug("REST request to update Job : {}", job);
-        if (job.getId() == null) {
-            return createJob(job);
+    public ResponseEntity<JobDTO> updateJob(@RequestBody JobDTO jobDTO) throws URISyntaxException {
+        log.debug("REST request to update Job : {}", jobDTO);
+        if (jobDTO.getId() == null) {
+            return createJob(jobDTO);
         }
-        Job result = jobRepository.save(job);
+        Job job = jobMapper.jobDTOToJob(jobDTO);
+        job = jobRepository.save(job);
+        JobDTO result = jobMapper.jobToJobDTO(job);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert("job", job.getId().toString()))
+            .headers(HeaderUtil.createEntityUpdateAlert("job", jobDTO.getId().toString()))
             .body(result);
     }
 
@@ -90,28 +99,29 @@ public class JobResource {
         method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<List<Job>> getAllJobs(Pageable pageable)
+    public ResponseEntity<List<JobDTO>> getAllJobs(Pageable pageable)
         throws URISyntaxException {
         log.debug("REST request to get a page of Jobs");
         Page<Job> page = jobRepository.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/jobs");
-        return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+        return new ResponseEntity<>(jobMapper.jobsToJobDTOs(page.getContent()), headers, HttpStatus.OK);
     }
 
     /**
      * GET  /jobs/:id : get the "id" job.
      *
-     * @param id the id of the job to retrieve
-     * @return the ResponseEntity with status 200 (OK) and with body the job, or with status 404 (Not Found)
+     * @param id the id of the jobDTO to retrieve
+     * @return the ResponseEntity with status 200 (OK) and with body the jobDTO, or with status 404 (Not Found)
      */
     @RequestMapping(value = "/jobs/{id}",
         method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Job> getJob(@PathVariable Long id) {
+    public ResponseEntity<JobDTO> getJob(@PathVariable Long id) {
         log.debug("REST request to get Job : {}", id);
         Job job = jobRepository.findOneWithEagerRelationships(id);
-        return Optional.ofNullable(job)
+        JobDTO jobDTO = jobMapper.jobToJobDTO(job);
+        return Optional.ofNullable(jobDTO)
             .map(result -> new ResponseEntity<>(
                 result,
                 HttpStatus.OK))
@@ -121,7 +131,7 @@ public class JobResource {
     /**
      * DELETE  /jobs/:id : delete the "id" job.
      *
-     * @param id the id of the job to delete
+     * @param id the id of the jobDTO to delete
      * @return the ResponseEntity with status 200 (OK)
      */
     @RequestMapping(value = "/jobs/{id}",

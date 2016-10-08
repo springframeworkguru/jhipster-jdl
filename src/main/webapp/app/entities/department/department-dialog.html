@@ -14,12 +14,6 @@
                     ng-model="vm.department.id" readonly />
         </div>
         <div class="form-group">
-            <label class="control-label" for="field_departmentId">Department Id</label>
-            <input type="number" class="form-control" name="departmentId" id="field_departmentId"
-                    ng-model="vm.department.departmentId"
-                     />
-        </div>
-        <div class="form-group">
             <label class="control-label" for="field_departmentName">Department Name</label>
             <input type="text" class="form-control" name="departmentName" id="field_departmentName"
                     ng-model="vm.department.departmentName"
@@ -34,7 +28,7 @@
 
         <div class="form-group">
             <label for="field_location">Location</label>
-            <select class="form-control" id="field_location" name="location" ng-model="vm.department.location" ng-options="location as location.id for location in vm.locations | orderBy:'id' track by location.id">
+            <select class="form-control" id="field_location" name="location" ng-model="vm.department.locationId" ng-options="location.id as location.id for location in vm.locations | orderBy:'id'">
                 <option value=""></option>
             </select>
         </div>

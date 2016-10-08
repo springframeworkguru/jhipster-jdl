@@ -4,10 +4,6 @@
     <hr>
     <jhi-alert-error></jhi-alert-error>
     <dl class="dl-horizontal jh-entity-details">
-        <dt><span>Location Id</span></dt>
-        <dd>
-            <span>{{vm.location.locationId}}</span>
-        </dd>
         <dt><span>Street Address</span></dt>
         <dd>
             <span>{{vm.location.streetAddress}}</span>
@@ -26,7 +22,11 @@
         </dd>
         <dt><span>Country</span></dt>
         <dd>
-            <a ui-sref="country-detail({id:vm.location.country.id})">{{vm.location.country.id}}</a>
+            <span>{{vm.location.country}}</span>
+        </dd>
+        <dt><span>Country</span></dt>
+        <dd>
+            <a ui-sref="country-detail({id:vm.location.countryId})">{{vm.location.countryId}}</a>
         </dd>
     </dl>
 

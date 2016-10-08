@@ -22,9 +22,6 @@ public class Department implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "department_id")
-    private Long departmentId;
-
     @NotNull
     @Column(name = "department_name", nullable = false)
     private String departmentName;
@@ -43,19 +40,6 @@ public class Department implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Long getDepartmentId() {
-        return departmentId;
-    }
-
-    public Department departmentId(Long departmentId) {
-        this.departmentId = departmentId;
-        return this;
-    }
-
-    public void setDepartmentId(Long departmentId) {
-        this.departmentId = departmentId;
     }
 
     public String getDepartmentName() {
@@ -133,7 +117,6 @@ public class Department implements Serializable {
     public String toString() {
         return "Department{" +
             "id=" + id +
-            ", departmentId='" + departmentId + "'" +
             ", departmentName='" + departmentName + "'" +
             '}';
     }

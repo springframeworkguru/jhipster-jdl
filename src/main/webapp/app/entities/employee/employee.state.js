@@ -95,7 +95,6 @@
                     resolve: {
                         entity: function () {
                             return {
-                                employeeId: null,
                                 firstName: null,
                                 lastName: null,
                                 email: null,

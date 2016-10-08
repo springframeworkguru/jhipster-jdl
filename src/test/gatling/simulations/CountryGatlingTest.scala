@@ -67,7 +67,7 @@ class CountryGatlingTest extends Simulation {
             .exec(http("Create new country")
             .post("/api/countries")
             .headers(headers_http_authenticated)
-            .body(StringBody("""{"id":null, "countryId":null, "countryName":"SAMPLE_TEXT"}""")).asJSON
+            .body(StringBody("""{"id":null, "countryName":"SAMPLE_TEXT"}""")).asJSON
             .check(status.is(201))
             .check(headerRegex("Location", "(.*)").saveAs("new_country_url"))).exitHereIfFailed
             .pause(10)

@@ -5,9 +5,9 @@
         .module('jdlDemoApp')
         .controller('JobHistoryDetailController', JobHistoryDetailController);
 
-    JobHistoryDetailController.$inject = ['$scope', '$rootScope', '$stateParams', 'previousState', 'entity', 'JobHistory', 'Department', 'Job', 'Employee'];
+    JobHistoryDetailController.$inject = ['$scope', '$rootScope', '$stateParams', 'previousState', 'entity', 'JobHistory', 'Job', 'Department', 'Employee'];
 
-    function JobHistoryDetailController($scope, $rootScope, $stateParams, previousState, entity, JobHistory, Department, Job, Employee) {
+    function JobHistoryDetailController($scope, $rootScope, $stateParams, previousState, entity, JobHistory, Job, Department, Employee) {
         var vm = this;
 
         vm.jobHistory = entity;

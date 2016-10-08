@@ -4,17 +4,13 @@
     <hr>
     <jhi-alert-error></jhi-alert-error>
     <dl class="dl-horizontal jh-entity-details">
-        <dt><span>Country Id</span></dt>
-        <dd>
-            <span>{{vm.country.countryId}}</span>
-        </dd>
         <dt><span>Country Name</span></dt>
         <dd>
             <span>{{vm.country.countryName}}</span>
         </dd>
         <dt><span>Region</span></dt>
         <dd>
-            <a ui-sref="region-detail({id:vm.country.region.id})">{{vm.country.region.id}}</a>
+            <a ui-sref="region-detail({id:vm.country.regionId})">{{vm.country.regionId}}</a>
         </dd>
     </dl>
 

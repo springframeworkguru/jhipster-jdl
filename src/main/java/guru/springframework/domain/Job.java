@@ -20,9 +20,6 @@ public class Job implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "job_id")
-    private Long jobId;
-
     @Column(name = "job_title")
     private String jobTitle;
 
@@ -32,14 +29,14 @@ public class Job implements Serializable {
     @Column(name = "max_salary")
     private Long maxSalary;
 
+    @ManyToOne
+    private Employee employee;
+
     @ManyToMany
     @JoinTable(name = "job_task",
                joinColumns = @JoinColumn(name="jobs_id", referencedColumnName="ID"),
                inverseJoinColumns = @JoinColumn(name="tasks_id", referencedColumnName="ID"))
     private Set<Task> tasks = new HashSet<>();
-
-    @ManyToOne
-    private Employee employee;
 
     public Long getId() {
         return id;
@@ -47,19 +44,6 @@ public class Job implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Long getJobId() {
-        return jobId;
-    }
-
-    public Job jobId(Long jobId) {
-        this.jobId = jobId;
-        return this;
-    }
-
-    public void setJobId(Long jobId) {
-        this.jobId = jobId;
     }
 
     public String getJobTitle() {
@@ -101,6 +85,19 @@ public class Job implements Serializable {
         this.maxSalary = maxSalary;
     }
 
+    public Employee getEmployee() {
+        return employee;
+    }
+
+    public Job employee(Employee employee) {
+        this.employee = employee;
+        return this;
+    }
+
+    public void setEmployee(Employee employee) {
+        this.employee = employee;
+    }
+
     public Set<Task> getTasks() {
         return tasks;
     }
@@ -124,19 +121,6 @@ public class Job implements Serializable {
 
     public void setTasks(Set<Task> tasks) {
         this.tasks = tasks;
-    }
-
-    public Employee getEmployee() {
-        return employee;
-    }
-
-    public Job employee(Employee employee) {
-        this.employee = employee;
-        return this;
-    }
-
-    public void setEmployee(Employee employee) {
-        this.employee = employee;
     }
 
     @Override
@@ -163,7 +147,6 @@ public class Job implements Serializable {
     public String toString() {
         return "Job{" +
             "id=" + id +
-            ", jobId='" + jobId + "'" +
             ", jobTitle='" + jobTitle + "'" +
             ", minSalary='" + minSalary + "'" +
             ", maxSalary='" + maxSalary + "'" +

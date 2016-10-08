@@ -95,7 +95,6 @@
                     resolve: {
                         entity: function () {
                             return {
-                                departmentId: null,
                                 departmentName: null,
                                 id: null
                             };

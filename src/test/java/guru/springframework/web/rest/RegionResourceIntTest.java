@@ -3,6 +3,9 @@ package guru.springframework.web.rest;
 import guru.springframework.JdlDemoApp;
 import guru.springframework.domain.Region;
 import guru.springframework.repository.RegionRepository;
+import guru.springframework.service.RegionService;
+import guru.springframework.service.dto.RegionDTO;
+import guru.springframework.service.mapper.RegionMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,14 +40,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = JdlDemoApp.class)
 
 public class RegionResourceIntTest {
-
-    private static final Long DEFAULT_REGION_ID = 1L;
-    private static final Long UPDATED_REGION_ID = 2L;
     private static final String DEFAULT_REGION_NAME = "AAAAA";
     private static final String UPDATED_REGION_NAME = "BBBBB";
 
     @Inject
     private RegionRepository regionRepository;
+
+    @Inject
+    private RegionMapper regionMapper;
+
+    @Inject
+    private RegionService regionService;
 
     @Inject
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -63,7 +69,7 @@ public class RegionResourceIntTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
         RegionResource regionResource = new RegionResource();
-        ReflectionTestUtils.setField(regionResource, "regionRepository", regionRepository);
+        ReflectionTestUtils.setField(regionResource, "regionService", regionService);
         this.restRegionMockMvc = MockMvcBuilders.standaloneSetup(regionResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setMessageConverters(jacksonMessageConverter).build();
@@ -77,7 +83,6 @@ public class RegionResourceIntTest {
      */
     public static Region createEntity(EntityManager em) {
         Region region = new Region()
-                .regionId(DEFAULT_REGION_ID)
                 .regionName(DEFAULT_REGION_NAME);
         return region;
     }
@@ -93,17 +98,17 @@ public class RegionResourceIntTest {
         int databaseSizeBeforeCreate = regionRepository.findAll().size();
 
         // Create the Region
+        RegionDTO regionDTO = regionMapper.regionToRegionDTO(region);
 
         restRegionMockMvc.perform(post("/api/regions")
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                .content(TestUtil.convertObjectToJsonBytes(region)))
+                .content(TestUtil.convertObjectToJsonBytes(regionDTO)))
                 .andExpect(status().isCreated());
 
         // Validate the Region in the database
         List<Region> regions = regionRepository.findAll();
         assertThat(regions).hasSize(databaseSizeBeforeCreate + 1);
         Region testRegion = regions.get(regions.size() - 1);
-        assertThat(testRegion.getRegionId()).isEqualTo(DEFAULT_REGION_ID);
         assertThat(testRegion.getRegionName()).isEqualTo(DEFAULT_REGION_NAME);
     }
 
@@ -118,7 +123,6 @@ public class RegionResourceIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.[*].id").value(hasItem(region.getId().intValue())))
-                .andExpect(jsonPath("$.[*].regionId").value(hasItem(DEFAULT_REGION_ID.intValue())))
                 .andExpect(jsonPath("$.[*].regionName").value(hasItem(DEFAULT_REGION_NAME.toString())));
     }
 
@@ -133,7 +137,6 @@ public class RegionResourceIntTest {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(region.getId().intValue()))
-            .andExpect(jsonPath("$.regionId").value(DEFAULT_REGION_ID.intValue()))
             .andExpect(jsonPath("$.regionName").value(DEFAULT_REGION_NAME.toString()));
     }
 
@@ -155,19 +158,18 @@ public class RegionResourceIntTest {
         // Update the region
         Region updatedRegion = regionRepository.findOne(region.getId());
         updatedRegion
-                .regionId(UPDATED_REGION_ID)
                 .regionName(UPDATED_REGION_NAME);
+        RegionDTO regionDTO = regionMapper.regionToRegionDTO(updatedRegion);
 
         restRegionMockMvc.perform(put("/api/regions")
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                .content(TestUtil.convertObjectToJsonBytes(updatedRegion)))
+                .content(TestUtil.convertObjectToJsonBytes(regionDTO)))
                 .andExpect(status().isOk());
 
         // Validate the Region in the database
         List<Region> regions = regionRepository.findAll();
         assertThat(regions).hasSize(databaseSizeBeforeUpdate);
         Region testRegion = regions.get(regions.size() - 1);
-        assertThat(testRegion.getRegionId()).isEqualTo(UPDATED_REGION_ID);
         assertThat(testRegion.getRegionName()).isEqualTo(UPDATED_REGION_NAME);
     }
 

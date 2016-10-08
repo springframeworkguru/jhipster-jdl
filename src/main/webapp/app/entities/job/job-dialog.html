@@ -14,12 +14,6 @@
                     ng-model="vm.job.id" readonly />
         </div>
         <div class="form-group">
-            <label class="control-label" for="field_jobId">Job Id</label>
-            <input type="number" class="form-control" name="jobId" id="field_jobId"
-                    ng-model="vm.job.jobId"
-                     />
-        </div>
-        <div class="form-group">
             <label class="control-label" for="field_jobTitle">Job Title</label>
             <input type="text" class="form-control" name="jobTitle" id="field_jobTitle"
                     ng-model="vm.job.jobTitle"
@@ -39,14 +33,14 @@
         </div>
 
         <div class="form-group">
-            <label for="field_task">Task</label>
-            <select class="form-control" id="field_task" multiple name="task" ng-model="vm.job.tasks" ng-options="task as task.title for task in vm.tasks track by task.id"></select>
-        </div>
-        <div class="form-group">
             <label for="field_employee">Employee</label>
-            <select class="form-control" id="field_employee" name="employee" ng-model="vm.job.employee" ng-options="employee as employee.id for employee in vm.employees track by employee.id">
+            <select class="form-control" id="field_employee" name="employee" ng-model="vm.job.employeeId" ng-options="employee.id as employee.id for employee in vm.employees"            >
                 <option value=""></option>
             </select>
+        </div>
+        <div class="form-group">
+            <label for="field_task">Task</label>
+            <select class="form-control" id="field_task" multiple name="task" ng-model="vm.job.tasks" ng-options="task as task.title for task in vm.tasks track by task.id"></select>
         </div>
     </div>
     <div class="modal-footer">

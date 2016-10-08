@@ -67,7 +67,7 @@ class LocationGatlingTest extends Simulation {
             .exec(http("Create new location")
             .post("/api/locations")
             .headers(headers_http_authenticated)
-            .body(StringBody("""{"id":null, "locationId":null, "streetAddress":"SAMPLE_TEXT", "postalCode":"SAMPLE_TEXT", "city":"SAMPLE_TEXT", "stateProvince":"SAMPLE_TEXT"}""")).asJSON
+            .body(StringBody("""{"id":null, "streetAddress":"SAMPLE_TEXT", "postalCode":"SAMPLE_TEXT", "city":"SAMPLE_TEXT", "stateProvince":"SAMPLE_TEXT", "country":"SAMPLE_TEXT"}""")).asJSON
             .check(status.is(201))
             .check(headerRegex("Location", "(.*)").saveAs("new_location_url"))).exitHereIfFailed
             .pause(10)

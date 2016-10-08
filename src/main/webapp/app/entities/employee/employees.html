@@ -19,7 +19,6 @@
             <thead>
                 <tr jh-sort="vm.predicate" ascending="vm.reverse" callback="vm.reset()">
                     <th jh-sort-by="id"><span>ID</span> <span class="glyphicon glyphicon-sort"></span></th>
-                    <th jh-sort-by="employeeId"><span>Employee Id</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th jh-sort-by="firstName"><span>First Name</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th jh-sort-by="lastName"><span>Last Name</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th jh-sort-by="email"><span>Email</span> <span class="glyphicon glyphicon-sort"></span></th>
@@ -35,7 +34,6 @@
             <tbody infinite-scroll="vm.loadPage(vm.page + 1)" infinite-scroll-disabled="vm.page >= vm.links['last']">
                 <tr ng-repeat="employee in vm.employees track by employee.id">
                     <td><a ui-sref="employee-detail({id:employee.id})">{{employee.id}}</a></td>
-                    <td>{{employee.employeeId}}</td>
                     <td>{{employee.firstName}}</td>
                     <td>{{employee.lastName}}</td>
                     <td>{{employee.email}}</td>
