@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # jdl_demo
 
 This application was generated using JHipster, you can find documentation and help at [https://jhipster.github.io](https://jhipster.github.io).
@@ -85,4 +84,3 @@ To setup this project in Jenkins, use the following configuration:
 [Protractor]: https://angular.github.io/protractor/
 =======
 # jhipster-jdl
->>>>>>> 09af206657df6f4b01b52c636ab8876880331d93
