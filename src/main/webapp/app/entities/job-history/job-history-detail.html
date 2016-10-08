@@ -1,0 +1,39 @@
+
+<div>
+    <h2><span>Job History</span> {{vm.jobHistory.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="dl-horizontal jh-entity-details">
+        <dt><span>Start Date</span></dt>
+        <dd>
+            <span>{{vm.jobHistory.startDate | date:'medium'}}</span>
+        </dd>
+        <dt><span>End Date</span></dt>
+        <dd>
+            <span>{{vm.jobHistory.endDate | date:'medium'}}</span>
+        </dd>
+        <dt><span>Department</span></dt>
+        <dd>
+            <a ui-sref="department-detail({id:vm.jobHistory.department.id})">{{vm.jobHistory.department.id}}</a>
+        </dd>
+        <dt><span>Job</span></dt>
+        <dd>
+            <a ui-sref="job-detail({id:vm.jobHistory.job.id})">{{vm.jobHistory.job.id}}</a>
+        </dd>
+        <dt><span>Employee</span></dt>
+        <dd>
+            <a ui-sref="employee-detail({id:vm.jobHistory.employee.id})">{{vm.jobHistory.employee.id}}</a>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            ui-sref="{{ vm.previousState }}"
+            class="btn btn-info">
+        <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span> Back</span>
+    </button>
+
+    <button type="button" ui-sref="job-history-detail.edit({id:vm.jobHistory.id})" class="btn btn-primary">
+        <span class="glyphicon glyphicon-pencil"></span>
+        <span class="hidden-xs hidden-sm"> Edit</span>
+    </button>
+</div>

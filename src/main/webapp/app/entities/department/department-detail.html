@@ -1,0 +1,31 @@
+
+<div>
+    <h2><span>Department</span> {{vm.department.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="dl-horizontal jh-entity-details">
+        <dt><span>Department Id</span></dt>
+        <dd>
+            <span>{{vm.department.departmentId}}</span>
+        </dd>
+        <dt><span>Department Name</span></dt>
+        <dd>
+            <span>{{vm.department.departmentName}}</span>
+        </dd>
+        <dt><span>Location</span></dt>
+        <dd>
+            <a ui-sref="location-detail({id:vm.department.location.id})">{{vm.department.location.id}}</a>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            ui-sref="{{ vm.previousState }}"
+            class="btn btn-info">
+        <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span> Back</span>
+    </button>
+
+    <button type="button" ui-sref="department-detail.edit({id:vm.department.id})" class="btn btn-primary">
+        <span class="glyphicon glyphicon-pencil"></span>
+        <span class="hidden-xs hidden-sm"> Edit</span>
+    </button>
+</div>

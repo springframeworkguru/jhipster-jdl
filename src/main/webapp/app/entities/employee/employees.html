@@ -1,0 +1,78 @@
+<div>
+    <h2>Employees</h2>
+    <jhi-alert></jhi-alert>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xs-4 no-padding-left">
+                <button class="btn btn-primary" ui-sref="employee.new" >
+                    <span class="glyphicon glyphicon-plus"></span>
+                    <span >
+                        Create new Employee
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <br/>
+    <div class="table-responsive">
+        <table class="jh-table table table-striped">
+            <thead>
+                <tr jh-sort="vm.predicate" ascending="vm.reverse" callback="vm.reset()">
+                    <th jh-sort-by="id"><span>ID</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="employeeId"><span>Employee Id</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="firstName"><span>First Name</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="lastName"><span>Last Name</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="email"><span>Email</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="phoneNumber"><span>Phone Number</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="hireDate"><span>Hire Date</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="salary"><span>Salary</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="commissionPct"><span>Commission Pct</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="departmentId"><span>Department</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="managerId"><span>Manager</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody infinite-scroll="vm.loadPage(vm.page + 1)" infinite-scroll-disabled="vm.page >= vm.links['last']">
+                <tr ng-repeat="employee in vm.employees track by employee.id">
+                    <td><a ui-sref="employee-detail({id:employee.id})">{{employee.id}}</a></td>
+                    <td>{{employee.employeeId}}</td>
+                    <td>{{employee.firstName}}</td>
+                    <td>{{employee.lastName}}</td>
+                    <td>{{employee.email}}</td>
+                    <td>{{employee.phoneNumber}}</td>
+                    <td>{{employee.hireDate | date:'medium'}}</td>
+                    <td>{{employee.salary}}</td>
+                    <td>{{employee.commissionPct}}</td>
+                    <td>
+                        <a ui-sref="department-detail({id:employee.departmentId})">{{employee.departmentId}}</a>
+                    </td>
+                    <td>
+                        <a ui-sref="employee-detail({id:employee.managerId})">{{employee.managerId}}</a>
+                    </td>
+                    <td class="text-right">
+                        <div class="btn-group flex-btn-group-container">
+                            <button type="submit"
+                                    ui-sref="employee-detail({id:employee.id})"
+                                    class="btn btn-info btn-sm">
+                                <span class="glyphicon glyphicon-eye-open"></span>
+                                <span class="hidden-xs hidden-sm"></span>
+                            </button>
+                            <button type="submit"
+                                    ui-sref="employee.edit({id:employee.id})"
+                                    class="btn btn-primary btn-sm">
+                                <span class="glyphicon glyphicon-pencil"></span>
+                                <span class="hidden-xs hidden-sm"></span>
+                            </button>
+                            <button type="submit"
+                                    ui-sref="employee.delete({id:employee.id})"
+                                    class="btn btn-danger btn-sm">
+                                <span class="glyphicon glyphicon-remove-circle"></span>
+                                <span class="hidden-xs hidden-sm"></span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

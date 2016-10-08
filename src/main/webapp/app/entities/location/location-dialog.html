@@ -1,0 +1,62 @@
+
+<form name="editForm" role="form" novalidate ng-submit="vm.save()">
+
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
+                ng-click="vm.clear()">&times;</button>
+        <h4 class="modal-title" id="myLocationLabel">Create or edit a Location</h4>
+    </div>
+    <div class="modal-body">
+        <jhi-alert-error></jhi-alert-error>
+        <div class="form-group" ng-show="vm.location.id">
+            <label for="id">ID</label>
+            <input type="text" class="form-control" id="id" name="id"
+                    ng-model="vm.location.id" readonly />
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="field_locationId">Location Id</label>
+            <input type="number" class="form-control" name="locationId" id="field_locationId"
+                    ng-model="vm.location.locationId"
+                     />
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="field_streetAddress">Street Address</label>
+            <input type="text" class="form-control" name="streetAddress" id="field_streetAddress"
+                    ng-model="vm.location.streetAddress"
+                     />
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="field_postalCode">Postal Code</label>
+            <input type="text" class="form-control" name="postalCode" id="field_postalCode"
+                    ng-model="vm.location.postalCode"
+                     />
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="field_city">City</label>
+            <input type="text" class="form-control" name="city" id="field_city"
+                    ng-model="vm.location.city"
+                     />
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="field_stateProvince">State Province</label>
+            <input type="text" class="form-control" name="stateProvince" id="field_stateProvince"
+                    ng-model="vm.location.stateProvince"
+                     />
+        </div>
+
+        <div class="form-group">
+            <label for="field_country">Country</label>
+            <select class="form-control" id="field_country" name="country" ng-model="vm.location.country" ng-options="country as country.id for country in vm.countries | orderBy:'id' track by country.id">
+                <option value=""></option>
+            </select>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="vm.clear()">
+            <span class="glyphicon glyphicon-ban-circle"></span>&nbsp;<span>Cancel</span>
+        </button>
+        <button type="submit" ng-disabled="editForm.$invalid || vm.isSaving" class="btn btn-primary">
+            <span class="glyphicon glyphicon-save"></span>&nbsp;<span>Save</span>
+        </button>
+    </div>
+</form>

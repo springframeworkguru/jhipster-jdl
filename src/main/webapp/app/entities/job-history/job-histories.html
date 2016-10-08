@@ -1,0 +1,70 @@
+<div>
+    <h2>Job Histories</h2>
+    <jhi-alert></jhi-alert>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xs-4 no-padding-left">
+                <button class="btn btn-primary" ui-sref="job-history.new" >
+                    <span class="glyphicon glyphicon-plus"></span>
+                    <span >
+                        Create new Job History
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <br/>
+    <div class="table-responsive">
+        <table class="jh-table table table-striped">
+            <thead>
+                <tr jh-sort="vm.predicate" ascending="vm.reverse" callback="vm.reset()">
+                    <th jh-sort-by="id"><span>ID</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="startDate"><span>Start Date</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="endDate"><span>End Date</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="department.id"><span>Department</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="job.id"><span>Job</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="employee.id"><span>Employee</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody infinite-scroll="vm.loadPage(vm.page + 1)" infinite-scroll-disabled="vm.page >= vm.links['last']">
+                <tr ng-repeat="jobHistory in vm.jobHistories track by jobHistory.id">
+                    <td><a ui-sref="job-history-detail({id:jobHistory.id})">{{jobHistory.id}}</a></td>
+                    <td>{{jobHistory.startDate | date:'medium'}}</td>
+                    <td>{{jobHistory.endDate | date:'medium'}}</td>
+                    <td>
+                        <a ui-sref="department-detail({id:jobHistory.department.id})">{{jobHistory.department.id}}</a>
+                    </td>
+                    <td>
+                        <a ui-sref="job-detail({id:jobHistory.job.id})">{{jobHistory.job.id}}</a>
+                    </td>
+                    <td>
+                        <a ui-sref="employee-detail({id:jobHistory.employee.id})">{{jobHistory.employee.id}}</a>
+                    </td>
+                    <td class="text-right">
+                        <div class="btn-group flex-btn-group-container">
+                            <button type="submit"
+                                    ui-sref="job-history-detail({id:jobHistory.id})"
+                                    class="btn btn-info btn-sm">
+                                <span class="glyphicon glyphicon-eye-open"></span>
+                                <span class="hidden-xs hidden-sm"></span>
+                            </button>
+                            <button type="submit"
+                                    ui-sref="job-history.edit({id:jobHistory.id})"
+                                    class="btn btn-primary btn-sm">
+                                <span class="glyphicon glyphicon-pencil"></span>
+                                <span class="hidden-xs hidden-sm"></span>
+                            </button>
+                            <button type="submit"
+                                    ui-sref="job-history.delete({id:jobHistory.id})"
+                                    class="btn btn-danger btn-sm">
+                                <span class="glyphicon glyphicon-remove-circle"></span>
+                                <span class="hidden-xs hidden-sm"></span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
